@@ -1,5 +1,7 @@
 from yowsup.structs import ProtocolEntity, ProtocolTreeNode
 from .message_media_downloadable import DownloadableMediaMessageProtocolEntity
+from .builder_message_media_downloadable import DownloadableMediaMessageBuilder
+
 class AudioDownloadableMediaMessageProtocolEntity(DownloadableMediaMessageProtocolEntity):
     '''
     <message t="{{TIME_STAMP}}" from="{{CONTACT_JID}}"
@@ -54,7 +56,7 @@ class AudioDownloadableMediaMessageProtocolEntity(DownloadableMediaMessageProtoc
 
     def toProtocolTreeNode(self):
         node = super(AudioDownloadableMediaMessageProtocolEntity, self).toProtocolTreeNode()
-        mediaNode = node.getChild("media")
+        mediaNode = node.getChild("enc")
 
         if self.abitrate:
             mediaNode.setAttribute("abitrate",  self.abitrate)
@@ -77,7 +79,7 @@ class AudioDownloadableMediaMessageProtocolEntity(DownloadableMediaMessageProtoc
     def fromProtocolTreeNode(node):
         entity = DownloadableMediaMessageProtocolEntity.fromProtocolTreeNode(node)
         entity.__class__ = AudioDownloadableMediaMessageProtocolEntity
-        mediaNode = node.getChild("media")
+        mediaNode = node.getChild("enc")
         entity.setAudioProps(
             mediaNode.getAttributeValue("abitrate"),
             mediaNode.getAttributeValue("acodec"),
@@ -90,10 +92,25 @@ class AudioDownloadableMediaMessageProtocolEntity(DownloadableMediaMessageProtoc
         return entity
 
 
+    @staticmethod
+    def getBuilder(jid, filepath):
+        return DownloadableMediaMessageBuilder(AudioDownloadableMediaMessageProtocolEntity, jid, filepath)
 
     @staticmethod
-    def fromFilePath(fpath, url, ip, to, mimeType = None, preview = None, filehash = None, filesize = None):
-        entity = DownloadableMediaMessageProtocolEntity.fromFilePath(fpath, url, DownloadableMediaMessageProtocolEntity.MEDIA_TYPE_AUDIO, ip, to, mimeType, preview)
-        entity.__class__ = AudioDownloadableMediaMessageProtocolEntity
-        entity.setAudioProps()
+    def fromBuilder(builder):
+        filepath = builder.getFilepath()
+
+        entity = DownloadableMediaMessageProtocolEntity.fromBuilder(builder)
+        entity.__class__ = builder.cls
+        entity.setAudioProps(encoding = "wav", duration = 30, seconds = 30)
         return entity
+
+    @staticmethod
+    def fromFilePath(path, url, ip, to, mimeType = None, preview = None, filehash = None, filesize = None):
+        builder = AudioDownloadableMediaMessageProtocolEntity.getBuilder(to, path)
+        builder.set("url", url)
+        builder.set("ip", ip)
+        builder.set("duration", 30)
+        builder.set("mimetype", mimeType)
+        builder.set("unk", 30)
+        return AudioDownloadableMediaMessageProtocolEntity.fromBuilder(builder)

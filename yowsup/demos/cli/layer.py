@@ -22,7 +22,13 @@ from yowsup.layers.protocol_profiles.protocolentities    import *
 from yowsup.common.tools import Jid
 from yowsup.common.optionalmodules import PILOptionalModule, AxolotlOptionalModule
 
-logger = logging.getLogger(__name__)
+logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
+logger = logging.getLogger()
+
+fileHandler = logging.FileHandler("{0}/{1}.log".format("/tmp", "yowsup"))
+fileHandler.setFormatter(logFormatter)
+logger.addHandler(fileHandler)
+
 class YowsupCliLayer(Cli, YowInterfaceLayer):
     PROP_RECEIPT_AUTO       = "org.openwhatsapp.yowsup.prop.cli.autoreceipt"
     PROP_RECEIPT_KEEPALIVE  = "org.openwhatsapp.yowsup.prop.cli.keepalive"
@@ -391,6 +397,7 @@ class YowsupCliLayer(Cli, YowInterfaceLayer):
     @clicmd("Send an image with optional caption")
     def image_send(self, number, path, caption = None):
         self.media_send(number, path, RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE)
+        #self.media_send("4917623966428", "sprechen.png", RequestUploadIqProtocolEntity.MEDIA_TYPE_IMAGE)
 
     @clicmd("Send audio file")
     def audio_send(self, number, path):
@@ -404,7 +411,6 @@ class YowsupCliLayer(Cli, YowInterfaceLayer):
             errorFn = lambda errorEntity, originalEntity: self.onRequestUploadError(jid, path, errorEntity, originalEntity)
             self._sendIq(entity, successFn, errorFn)
 
-            self._sendIq(entity, successFn, errorFn)
     @clicmd("Send typing state")
     def state_typing(self, jid):
         if self.assertConnected():
@@ -508,7 +514,8 @@ class YowsupCliLayer(Cli, YowInterfaceLayer):
         output = self.__class__.MESSAGE_FORMAT.format(
             FROM = sender,
             TIME = formattedDate,
-            MESSAGE = messageOut.encode('latin-1').decode() if sys.version_info >= (3, 0) else messageOut,
+            MESSAGE = messageOut,
+            #MESSAGE = messageOut if sys.version_info >= (3, 0) else messageOut,
             MESSAGE_ID = message.getId()
             )
 

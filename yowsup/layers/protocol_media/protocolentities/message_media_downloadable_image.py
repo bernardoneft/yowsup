@@ -56,14 +56,14 @@ class ImageDownloadableMediaMessageProtocolEntity(DownloadableMediaMessageProtoc
 
     def toProtocolTreeNode(self):
         node = super(ImageDownloadableMediaMessageProtocolEntity, self).toProtocolTreeNode()
-        mediaNode = node.getChild("media")
+        mediaNode = node.getChild("enc")
+        print ("MIME:" + self.mimeType)
 
         mediaNode.setAttribute("encoding",  self.encoding)
         mediaNode.setAttribute("width",     str(self.width))
         mediaNode.setAttribute("height",    str(self.height))
         if self.caption:
             mediaNode.setAttribute("caption", self.caption)
-
         return node
 
     def toProtobufMessage(self):
@@ -101,9 +101,17 @@ class ImageDownloadableMediaMessageProtocolEntity(DownloadableMediaMessageProtoc
     @staticmethod
     def fromBuilder(builder):
         builder.getOrSet("preview", lambda: ImageTools.generatePreviewFromImage(builder.getOriginalFilepath()))
+
+        print('====================================')
+        print( ImageTools.getImageDimensions( builder.getOriginalFilepath() ) )
+        print('====================================')
+
         filepath = builder.getFilepath()
         caption = builder.get("caption")
-        dimensions = builder.get("dimensions",  ImageTools.getImageDimensions(builder.getOriginalFilepath()))
+        dimensions = builder.get("dimensions",  ImageTools.getImageDimensions( builder.getOriginalFilepath() ))
+
+        print(dimensions)
+
         assert dimensions, "Could not determine image dimensions"
         width, height = dimensions
 
