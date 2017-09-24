@@ -237,12 +237,10 @@ class AxolotlReceivelayer(AxolotlBaseLayer):
         self.toUpper(messageNode)
 
     def handleUrlMessage(self, originalEncNode, urlMessage):
-        #convert to ??
-        pass
+        self.handleConversationMessage(originalEncNode, UrlMessage.text)
 
     def handleDocumentMessage(self, originalEncNode, documentMessage):
-        #convert to ??
-        pass
+        self.handleConversationMessage(originalEncNode, documentMessage.text)
 
     def handleLocationMessage(self, originalEncNode, locationMessage):
         messageNode = copy.deepcopy(originalEncNode)
