@@ -84,12 +84,9 @@ class YowInterfaceLayer(YowLayer):
     @ProtocolEntityCallback("stream:error")
     def onStreamError(self, streamErrorEntity):
         logger.error(streamErrorEntity)
-        if self.getProp(self.__class__.PROP_RECONNECT_ON_STREAM_ERR, True):
-            if streamErrorEntity.getErrorType() == StreamErrorProtocolEntity.TYPE_CONFLICT:
-                logger.warn("Not reconnecting because you signed in in another location")
-            else:
-                logger.info("Initiating reconnect")
-                self.reconnect = True
+        if self.getProp(self.__class__.PROP_RECONNECT_ON_STREAM_ERR, True):    
+            logger.info("Initiating reconnect")
+            self.reconnect = True
         else:
             logger.warn("Not reconnecting because property %s is not set" % self.__class__.PROP_RECONNECT_ON_STREAM_ERR)
         self.toUpper(streamErrorEntity)
