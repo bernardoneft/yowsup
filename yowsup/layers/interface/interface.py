@@ -8,7 +8,8 @@ from yowsup.layers.auth.protocolentities import StreamErrorProtocolEntity
 from yowsup.layers import EventCallback
 import inspect
 import logging
-logger = logging.getLogger(__name__)
+import os
+logger = logging.getLogger('interface')
 
 class ProtocolEntityCallback(object):
     def __init__(self, entityType):
@@ -68,7 +69,7 @@ class YowInterfaceLayer(YowLayer):
         self.getLayerInterface(YowNetworkLayer).connect()
 
     def disconnect(self):
-        logger.debug("Disconnect event broadcast")
+        logger.debug("DISCONNECT event broadcast")
         logger.debug(YowNetworkLayer.EVENT_STATE_DISCONNECT)
         disconnectEvent = YowLayerEvent(YowNetworkLayer.EVENT_STATE_DISCONNECT)
         self.broadcastEvent(disconnectEvent)
@@ -87,12 +88,6 @@ class YowInterfaceLayer(YowLayer):
     @ProtocolEntityCallback("stream:error")
     def onStreamError(self, streamErrorEntity):
         logger.error(streamErrorEntity)
-        if self.getProp(self.__class__.PROP_RECONNECT_ON_STREAM_ERR, True):    
-            logger.info("Initiating reconnect")
-            self.reconnect = True
-        else:
-            logger.warn("Not reconnecting because property %s is not set" % self.__class__.PROP_RECONNECT_ON_STREAM_ERR)
-        self.toUpper(streamErrorEntity)
         self.disconnect()
 
     @EventCallback(YowNetworkLayer.EVENT_STATE_CONNECTED)
@@ -102,10 +97,7 @@ class YowInterfaceLayer(YowLayer):
     @EventCallback(YowNetworkLayer.EVENT_STATE_DISCONNECTED)
     def onDisconnected(self, yowLayerEvent):
         logger.debug("EVENT STATE DISCONNECTED")
-        if self.reconnect:
-            self.reconnect = False
-            logger.debug("calling reconnect")
-            self.connect()
+        os._exit(9)
 
     def _sendMediaMessage(self, builder, success, error = None, progress = None):
         # axolotlIface = self.getLayerInterface(YowAxolotlLayer)

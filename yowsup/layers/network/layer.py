@@ -2,7 +2,7 @@ from yowsup.layers import YowLayer, YowLayerEvent, EventCallback
 from yowsup.common.http.httpproxy import HttpProxy
 from yowsup.layers.network.layer_interface import YowNetworkLayerInterface
 import asyncore, socket, logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('network-layer')
 
 class YowNetworkLayer(YowLayer, asyncore.dispatcher_with_send):
     '''
