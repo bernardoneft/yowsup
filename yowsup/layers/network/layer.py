@@ -13,9 +13,7 @@ class YowNetworkLayer(YowLayer, asyncore.dispatcher_with_send):
     EVENT_STATE_CONNECT         = "org.openwhatsapp.yowsup.event.network.connect"
     EVENT_STATE_DISCONNECT      = "org.openwhatsapp.yowsup.event.network.disconnect"
     EVENT_STATE_CONNECTED       = "org.openwhatsapp.yowsup.event.network.connected"
-    EVENT_STATE_DISCONNECTED    = "org.openwhatsapp.yowsup.event.network.disconnected"
-    EVENT_STATE_STATUS          = "org.openwhatsapp.yowsup.event.network.status"
-    
+    EVENT_STATE_DISCONNECTED    = "org.openwhatsapp.yowsup.event.network.disconnected"    
 
     PROP_ENDPOINT               = "org.openwhatsapp.yowsup.prop.endpoint"
     PROP_NET_READSIZE           = "org.openwhatsapp.yowsup.prop.net.readSize"
@@ -44,19 +42,18 @@ class YowNetworkLayer(YowLayer, asyncore.dispatcher_with_send):
 
     @EventCallback(EVENT_STATE_CONNECT)
     def onConnect(self, ev):
+        logger.debug("event state connect")
         self.createConnection()
         return True
-    
-    @EventCallback(EVENT_STATE_STATUS)
-    def getStatus(self):
-        return self.connected
 
     @EventCallback(EVENT_STATE_DISCONNECT)
     def onDisconnect(self, ev):
+        loggger.debug("event state disconnect")
         self.destroyConnection(ev.getArg("reason"))
         return True
 
     def createConnection(self):
+        logger.debug("createConnection")
         self.state = self.__class__.STATE_CONNECTING
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
         self.out_buffer = bytearray()
@@ -93,6 +90,8 @@ class YowNetworkLayer(YowLayer, asyncore.dispatcher_with_send):
             self.connected = False
             logger.debug("Disconnected, reason: %s" % reason)
             self.emitEvent(YowLayerEvent(self.__class__.EVENT_STATE_DISCONNECTED, reason = reason, detached=True))
+            logger.debug("event disconnected sent")
+            logger.debug(self.__class__.EVENT_STATE_DISCONNECTED)
             self.close()
 
     def handle_error(self):
