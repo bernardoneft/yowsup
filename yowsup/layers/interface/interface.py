@@ -64,9 +64,12 @@ class YowInterfaceLayer(YowLayer):
         return self.getLayerInterface(YowAuthenticationProtocolLayer).getUsername(full)
 
     def connect(self):
+        logger.debug("Calling connect")
         self.getLayerInterface(YowNetworkLayer).connect()
 
     def disconnect(self):
+        logger.debug("Disconnect event broadcast")
+        logger.debug(YowNetworkLayer.EVENT_STATE_DISCONNECT)
         disconnectEvent = YowLayerEvent(YowNetworkLayer.EVENT_STATE_DISCONNECT)
         self.broadcastEvent(disconnectEvent)
 
@@ -98,6 +101,7 @@ class YowInterfaceLayer(YowLayer):
 
     @EventCallback(YowNetworkLayer.EVENT_STATE_DISCONNECTED)
     def onDisconnected(self, yowLayerEvent):
+        logger.debug("EVENT STATE DISCONNECTED")
         if self.reconnect:
             self.reconnect = False
             self.connect()
