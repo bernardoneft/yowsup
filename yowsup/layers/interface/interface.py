@@ -104,6 +104,7 @@ class YowInterfaceLayer(YowLayer):
         logger.debug("EVENT STATE DISCONNECTED")
         if self.reconnect:
             self.reconnect = False
+            logger.debug("calling reconnect")
             self.connect()
 
     def _sendMediaMessage(self, builder, success, error = None, progress = None):
